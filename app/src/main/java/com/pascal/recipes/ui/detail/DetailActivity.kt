@@ -11,7 +11,7 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.pascal.recipes.R
-import com.pascal.recipes.data.model.MealsItem
+import com.pascal.recipes.data.remote.model.MealsItem
 import com.pascal.recipes.databinding.ActivityDetailBinding
 
 

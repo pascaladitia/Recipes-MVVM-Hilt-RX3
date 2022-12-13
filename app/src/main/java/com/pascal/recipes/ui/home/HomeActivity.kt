@@ -8,13 +8,17 @@ import android.widget.SearchView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.pascal.recipes.data.model.MealsItem
-import com.pascal.recipes.data.model.ResponseListRecipe
+import com.pascal.recipes.data.local.model.Favorite
+import com.pascal.recipes.data.local.viewModel.ViewmodelLocal
+import com.pascal.recipes.data.remote.model.MealsItem
+import com.pascal.recipes.data.remote.model.ResponseListRecipe
 import com.pascal.recipes.databinding.ActivityHomeBinding
 import com.pascal.recipes.ui.adapter.AdapterRecipes
 import com.pascal.recipes.ui.detail.DetailActivity
+import com.pascal.recipes.ui.favorite.FavoriteActivity
 import com.pascal.recipes.ui.recipes.ListRecipeActivity
 import com.pascal.recipes.utils.getRandomQuery
+import com.pascal.recipes.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,6 +26,7 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private val viewModel: HomeViewModel by viewModels()
+    private val viewModelLocal: ViewmodelLocal by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +48,7 @@ class HomeActivity : AppCompatActivity() {
 
                 return false
             }
+
             override fun onQueryTextChange(newText: String): Boolean {
 
                 return false
@@ -69,6 +75,10 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("data", "vegetable")
             startActivity(intent)
         }
+        binding.seeFav.setOnClickListener {
+            val intent = Intent(this@HomeActivity, FavoriteActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun attachObserve() {
@@ -76,7 +86,7 @@ class HomeActivity : AppCompatActivity() {
         with(viewModel) {
             loadRecipes(getRandomQuery())
 
-            listRecipes.observe(this@HomeActivity, Observer{
+            listRecipes.observe(this@HomeActivity, Observer {
                 showData(it)
             })
 
@@ -85,7 +95,15 @@ class HomeActivity : AppCompatActivity() {
             })
 
             isError.observe(this@HomeActivity, Observer {
-                Log.e("tag error", it)
+                Log.e("tag error", it.toString())
+            })
+        }
+
+        with(viewModelLocal) {
+            loadFavorite()
+
+            responseInsert.observe(this@HomeActivity, Observer {
+                toast("Insert Success")
             })
         }
     }
@@ -100,12 +118,19 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 override fun favorite(item: MealsItem) {
-
+                    viewModelLocal.insertFavorite(
+                        Favorite(
+                            item.idMeal?.toInt(),
+                            item.strMeal,
+                            item.strCategory,
+                            item.strMealThumb
+                        )
+                    )
                 }
             })
             binding.recyclerList.adapter = adapter
         } else {
-            attachObserve()
+            toast("Not Found")
         }
     }
 }

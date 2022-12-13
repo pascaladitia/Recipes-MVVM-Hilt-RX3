@@ -2,7 +2,7 @@ package com.pascal.recipes.di
 
 
 import androidx.viewbinding.BuildConfig
-import com.pascal.recipes.data.api.ApiService
+import com.pascal.recipes.data.remote.api.ApiService
 import com.pascal.recipes.utils.AppConstans.BASE_URL
 import dagger.Module
 import dagger.Provides

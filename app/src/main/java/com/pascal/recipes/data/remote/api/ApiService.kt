@@ -1,7 +1,7 @@
-package com.pascal.recipes.data.api
+package com.pascal.recipes.data.remote.api
 
-import com.pascal.recipes.data.model.ResponseListCategory
-import com.pascal.recipes.data.model.ResponseListRecipe
+import com.pascal.recipes.data.remote.model.ResponseListCategory
+import com.pascal.recipes.data.remote.model.ResponseListRecipe
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 import retrofit2.http.Query

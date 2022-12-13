@@ -8,21 +8,21 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.pascal.recipes.R
-import com.pascal.recipes.data.remote.model.MealsItem
+import com.pascal.recipes.data.local.model.Favorite
 import com.pascal.recipes.databinding.ItemRecipesBinding
 
 
-class AdapterRecipes(
-    val data: List<MealsItem?>?,
+class AdapterFavorite(
+    val data: List<Favorite?>,
     val itemClick: OnClickListener
-) : RecyclerView.Adapter<AdapterRecipes.ViewHolder>() {
+) : RecyclerView.Adapter<AdapterFavorite.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterRecipes.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterFavorite.ViewHolder {
         val binding = ItemRecipesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: AdapterRecipes.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: AdapterFavorite.ViewHolder, position: Int) {
         val item = data?.get(position)
         holder.bind(item!!)
     }
@@ -31,12 +31,12 @@ class AdapterRecipes(
 
     inner class ViewHolder(val binding: ItemRecipesBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: MealsItem) {
-            binding.title.text = item?.strMeal
-            binding.desc.text = item?.strCategory
+        fun bind(item: Favorite) {
+            binding.title.text = item?.title
+            binding.desc.text = item?.desc
 
             Glide.with(binding.root)
-                .load(item?.strMealThumb)
+                .load(item?.url)
                 .apply(
                     RequestOptions()
                         .override(1000, 1000)
@@ -56,7 +56,7 @@ class AdapterRecipes(
     }
 
     interface OnClickListener {
-        fun detail(item: MealsItem)
-        fun favorite(item: MealsItem)
+        fun detail(item: Favorite)
+        fun favorite(item: Favorite)
     }
 }

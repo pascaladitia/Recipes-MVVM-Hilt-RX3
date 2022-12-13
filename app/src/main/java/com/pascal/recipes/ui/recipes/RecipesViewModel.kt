@@ -3,9 +3,8 @@ package com.pascal.recipes.ui.recipes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.pascal.recipes.data.api.ApiResponse
-import com.pascal.recipes.data.model.ResponseListCategory
-import com.pascal.recipes.data.repo.RemoteRepository
+import com.pascal.recipes.data.remote.model.ResponseListCategory
+import com.pascal.recipes.data.remote.repo.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -17,28 +16,21 @@ class RecipesViewModel @Inject constructor(
 
     private val responseData = MutableLiveData<ResponseListCategory?>()
     val listCategory: LiveData<ResponseListCategory?> = responseData
-    val isLoading = MutableLiveData<Boolean>()
     private val compositeDisposable = CompositeDisposable()
+    val isLoading = MutableLiveData<Boolean>()
+    val isError = MutableLiveData<Throwable>()
 
     fun loadCategory() {
-        showLoading(true)
-        remoteRepository.getCategory(compositeDisposable, object :
-            ApiResponse<ResponseListCategory> {
-            override fun onSuccess(result: ResponseListCategory?) {
-                showLoading(false)
-                responseData.value = result
-            }
+        isLoading.value = true
+        remoteRepository.getCategory(compositeDisposable, {
 
-            override fun onError(t: Throwable) {
-                showLoading(false)
-                t.printStackTrace()
-            }
+            isLoading.value = false
+            responseData.value = it
 
+        }, {
+            isLoading.value = false
+            isError.value = it
         })
-    }
-
-    private fun showLoading(isVisible: Boolean) {
-        isLoading.value = isVisible
     }
 
     override fun onCleared() {

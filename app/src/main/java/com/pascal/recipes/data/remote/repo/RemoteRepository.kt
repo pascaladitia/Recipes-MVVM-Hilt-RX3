@@ -1,9 +1,8 @@
-package com.pascal.recipes.data.repo
+package com.pascal.recipes.data.remote.repo
 
-import com.pascal.recipes.data.api.ApiResponse
-import com.pascal.recipes.data.api.ApiService
-import com.pascal.recipes.data.model.ResponseListCategory
-import com.pascal.recipes.data.model.ResponseListRecipe
+import com.pascal.recipes.data.remote.api.ApiService
+import com.pascal.recipes.data.remote.model.ResponseListCategory
+import com.pascal.recipes.data.remote.model.ResponseListRecipe
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -16,15 +15,16 @@ class RemoteRepository @Inject constructor(
     fun getRecipes(
         name: String,
         compositeDisposable: CompositeDisposable,
-        onResponse: ApiResponse<ResponseListRecipe>
+        onResponse: (ResponseListRecipe) -> Unit,
+        onError: (Throwable) -> Unit
     ): Disposable {
         return apiService.getRecipes(name)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                onResponse.onSuccess(it)
+                onResponse(it)
             }, {
-                onResponse.onError(it)
+                onError(it)
             }).also {
                 compositeDisposable.add(it)
             }
@@ -33,15 +33,16 @@ class RemoteRepository @Inject constructor(
     fun getSearch(
         name: String,
         compositeDisposable: CompositeDisposable,
-        onResponse: ApiResponse<ResponseListRecipe>
+        onResponse: (ResponseListRecipe) -> Unit,
+        onError: (Throwable) -> Unit
     ): Disposable {
         return apiService.getSearch(name)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                onResponse.onSuccess(it)
+                onResponse(it)
             }, {
-                onResponse.onError(it)
+                onError(it)
             }).also {
                 compositeDisposable.add(it)
             }
@@ -49,15 +50,16 @@ class RemoteRepository @Inject constructor(
 
     fun getCategory(
         compositeDisposable: CompositeDisposable,
-        onResponse: ApiResponse<ResponseListCategory>
+        onResponse: (ResponseListCategory) -> Unit,
+        onError: (Throwable) -> Unit
     ): Disposable {
         return apiService.getCategory()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                  onResponse.onSuccess(it)
+                onResponse(it)
             }, {
-                onResponse.onError(it)
+                onError(it)
             }).also {
                 compositeDisposable.add(it)
             }

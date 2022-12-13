@@ -7,8 +7,8 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.pascal.recipes.data.model.MealsItem
-import com.pascal.recipes.data.model.ResponseListRecipe
+import com.pascal.recipes.data.remote.model.MealsItem
+import com.pascal.recipes.data.remote.model.ResponseListRecipe
 import com.pascal.recipes.databinding.ActivityListRecipeBinding
 import com.pascal.recipes.ui.adapter.AdapterRecipes
 import com.pascal.recipes.ui.detail.DetailActivity
@@ -56,7 +56,7 @@ class ListRecipeActivity : AppCompatActivity() {
             })
 
             isError.observe(this@ListRecipeActivity, Observer {
-                Log.e("tag error", it)
+                Log.e("tag error", it.toString())
             })
         }
     }

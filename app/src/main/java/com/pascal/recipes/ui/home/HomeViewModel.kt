@@ -3,9 +3,8 @@ package com.pascal.recipes.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.pascal.recipes.data.api.ApiResponse
-import com.pascal.recipes.data.model.ResponseListRecipe
-import com.pascal.recipes.data.repo.RemoteRepository
+import com.pascal.recipes.data.remote.model.ResponseListRecipe
+import com.pascal.recipes.data.remote.repo.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -13,52 +12,38 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val remoteRepository: RemoteRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val responseData = MutableLiveData<ResponseListRecipe?>()
     val listRecipes: LiveData<ResponseListRecipe?> = responseData
     private val compositeDisposable = CompositeDisposable()
     val isLoading = MutableLiveData<Boolean>()
-    val isError = MutableLiveData<String>()
+    val isError = MutableLiveData<Throwable>()
 
     fun loadRecipes(name: String) {
-        showLoading(true)
-        remoteRepository.getRecipes(name, compositeDisposable, object : ApiResponse<ResponseListRecipe> {
-            override fun onSuccess(result: ResponseListRecipe?) {
-                showLoading(false)
-                responseData.value = result
-            }
+        isLoading.value = true
+        remoteRepository.getRecipes(name, compositeDisposable, {
 
-            override fun onError(t: Throwable) {
-                showLoading(false)
-                showError(t.toString())
-            }
+            isLoading.value = false
+            responseData.value = it
 
+        }, {
+            isLoading.value = false
+            isError.value = it
         })
     }
 
     fun loadSearh(name: String) {
-        showLoading(true)
-        remoteRepository.getSearch(name, compositeDisposable, object : ApiResponse<ResponseListRecipe> {
-            override fun onSuccess(result: ResponseListRecipe?) {
-                showLoading(false)
-                responseData.value = result
-            }
+        isLoading.value = true
+        remoteRepository.getSearch(name, compositeDisposable, {
 
-            override fun onError(t: Throwable) {
-                showLoading(false)
-                showError(t.toString())
-            }
+            isLoading.value = false
+            responseData.value = it
 
+        }, {
+            isLoading.value = false
+            isError.value = it
         })
-    }
-
-    private fun showLoading(isVisible: Boolean) {
-        isLoading.value = isVisible
-    }
-
-    private fun showError(msg: String) {
-        isError.value = msg
     }
 
     override fun onCleared() {
